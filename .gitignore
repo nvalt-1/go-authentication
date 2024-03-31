@@ -2,7 +2,7 @@
 tmp
 dist
 **/*.exe
-
+ui-dist
 
 # Editor directories and files
 .vscode/*
