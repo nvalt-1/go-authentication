@@ -1,11 +1,9 @@
 package main
 
 import (
-	"authentication-test/api/auth"
 	"authentication-test/api/controllers"
 	"authentication-test/api/middlewares"
 	"github.com/joho/godotenv"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
@@ -28,12 +26,7 @@ func main() {
 
 	// every api call requires authorization
 	apiGroup := e.Group("/api")
-	apiGroup.Use(echojwt.WithConfig(echojwt.Config{
-		NewClaimsFunc: auth.GetClaims,
-		SigningKey:    []byte(auth.GetJWTSecret()),
-		TokenLookup:   "cookie:access-token",
-		ErrorHandler:  auth.JWTErrorChecker,
-	}))
+	apiGroup.Use(middlewares.JWTAuth())
 
 	// Controllers
 	e.POST("/login", controllers.Login())
