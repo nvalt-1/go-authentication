@@ -10,6 +10,10 @@ func main() {
 	e := echo.New()
 
 	// Middlewares
+	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.Recover())
+	e.Use(middleware.Secure())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Skipper: func(c echo.Context) bool {
 			return util.EndsWith(c.Path(), []string{"/assets*", "/*"})
