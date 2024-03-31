@@ -27,6 +27,7 @@ func main() {
 	// every api call requires authorization
 	apiGroup := e.Group("/api")
 	apiGroup.Use(middlewares.JWTAuth())
+	apiGroup.Use(middlewares.TokenRefresher)
 
 	// Controllers
 	e.POST("/login", controllers.Login())

@@ -11,13 +11,21 @@ import (
 )
 
 const (
-	accessTokenCookieName = "access-token"
+	AccessTokenCookieName  = "access-token"
+	RefreshTokenCookieName = "refresh-token"
 )
 
 func GetJWTSecret() string {
-	secret := os.Getenv("AUTH_TEST_SECRET")
+	secret := os.Getenv("AUTH_TEST_AUTH_SECRET")
 	if secret == "" {
-		log.Fatal("AUTH_TEST_SECRET not found in environment")
+		log.Fatal("AUTH_TEST_AUTH_SECRET not found in environment")
+	}
+	return secret
+}
+func GetRefreshJWTSecret() string {
+	secret := os.Getenv("AUTH_TEST_REFRESH_SECRET")
+	if secret == "" {
+		log.Fatal("AUTH_TEST_REFRESH_SECRET not found in environment")
 	}
 	return secret
 }
@@ -40,10 +48,24 @@ func GenerateTokensAndSetCookies(user *models.User, c echo.Context) error {
 		return err
 	}
 
-	setTokenCookie(accessTokenCookieName, accessToken, exp, c)
+	setTokenCookie(AccessTokenCookieName, accessToken, exp, c)
 	setUserCookie(user, exp, c)
 
+	// We generate here a new refresh token and saving it to the cookie.
+	refreshToken, exp, err := generateRefreshToken(user)
+	if err != nil {
+		return err
+	}
+	setTokenCookie(RefreshTokenCookieName, refreshToken, exp, c)
+
 	return nil
+}
+
+func generateRefreshToken(user *models.User) (string, time.Time, error) {
+	// Declare the expiration time of the token - 24 hours.
+	expirationTime := time.Now().Add(24 * time.Hour)
+
+	return generateToken(user, expirationTime, []byte(GetRefreshJWTSecret()))
 }
 
 func generateAccessToken(user *models.User) (string, time.Time, error) {
@@ -84,6 +106,7 @@ func setTokenCookie(name, token string, expiration time.Time, c echo.Context) {
 	cookie.Path = "/"
 	// Http-only helps mitigate the risk of client side script accessing the protected cookie.
 	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteStrictMode
 
 	c.SetCookie(cookie)
 }
@@ -95,6 +118,8 @@ func setUserCookie(user *models.User, expiration time.Time, c echo.Context) {
 	cookie.Value = user.Username
 	cookie.Expires = expiration
 	cookie.Path = "/"
+	cookie.SameSite = http.SameSiteStrictMode
+
 	c.SetCookie(cookie)
 }
 
