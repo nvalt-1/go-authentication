@@ -3,6 +3,7 @@ tmp
 dist
 **/*.exe
 ui-dist
+.env
 
 # Editor directories and files
 .vscode/*
