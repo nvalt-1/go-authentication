@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -21,6 +22,12 @@ func main() {
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup:    "header:X-XSRF-TOKEN",
+		CookiePath:     "/",
+		CookieSecure:   true,
+		CookieSameSite: http.SameSiteStrictMode,
+	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Use(middlewares.CustomLogger())
 
@@ -31,6 +38,7 @@ func main() {
 
 	// Controllers
 	e.POST("/login", controllers.Login())
+	e.POST("/logout", controllers.Logout())
 
 	// Serve react app
 	e.Static("/assets", "./ui-dist/assets")

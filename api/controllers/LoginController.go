@@ -34,6 +34,6 @@ func Login() echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid credentials")
 		}
 
-		return c.String(http.StatusOK, fmt.Sprintf("You're in, %s", storedUser.Username))
+		return c.JSON(http.StatusOK, fmt.Sprintf("You're in, %s", storedUser.Username))
 	}
 }
