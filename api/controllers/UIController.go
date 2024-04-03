@@ -11,7 +11,7 @@ const (
 	uiPath = "./ui-dist/"
 )
 
-// Essentially e.Static()
+// UI Essentially e.Static(), but falls back to index.html
 func UI() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		fullPath := uiPath + strings.TrimPrefix(path.Clean(c.Request().URL.String()), "/")
