@@ -8,15 +8,7 @@ import (
 
 func Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cookie := new(http.Cookie)
-		cookie.Name = auth.AccessTokenCookieName
-		cookie.MaxAge = -1
-		cookie.Path = "/"
-		cookie.Value = ""
-		cookie.HttpOnly = true
-		cookie.SameSite = http.SameSiteStrictMode
-
-		c.SetCookie(cookie)
+		auth.ExpireCookies(c)
 		return c.String(http.StatusOK, "Logged out")
 	}
 }

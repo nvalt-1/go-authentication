@@ -123,6 +123,28 @@ func setUserCookie(user *models.User, expiration time.Time, c echo.Context) {
 	c.SetCookie(cookie)
 }
 
+func ExpireCookies(c echo.Context) {
+	cookie := new(http.Cookie)
+	cookie.Name = AccessTokenCookieName
+	cookie.MaxAge = -1
+	cookie.Path = "/"
+	cookie.Value = ""
+	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteStrictMode
+
+	c.SetCookie(cookie)
+
+	cookie = new(http.Cookie)
+	cookie.Name = RefreshTokenCookieName
+	cookie.MaxAge = -1
+	cookie.Path = "/"
+	cookie.Value = ""
+	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteStrictMode
+
+	c.SetCookie(cookie)
+}
+
 // JWTErrorChecker will be executed when user tries to access a protected path.
 func JWTErrorChecker(c echo.Context, err error) error {
 	return echo.NewHTTPError(http.StatusUnauthorized)
