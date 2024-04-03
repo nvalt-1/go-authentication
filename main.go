@@ -40,10 +40,8 @@ func main() {
 	e.POST("/login", controllers.Login())
 	e.POST("/logout", controllers.Logout())
 
-	// Serve react app
-	e.Static("/assets", "./ui-dist/assets")
-	e.Static("/", "./ui-dist")
-	e.File("/", "ui-dist/index.html")
+	// Serve ui
+	e.GET("/*", controllers.UI())
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
